@@ -1,13 +1,17 @@
 const { Client, Intents } = require('discord.js');
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
 const keepAlive = require('./alive.js')
-keepAlive()
+keepAlive();
 
 // List of exempted channels
 const exemptedChannels = [];
 
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}`);
+  client.application.commands.create({
+    name: 'exempt',
+    description: 'Free channel from moderation',
+  });
 });
 
 client.on('messageCreate', (message) => {
@@ -27,6 +31,8 @@ client.on('messageCreate', (message) => {
     message.delete();
     member.send(`Sorry, your message in ${guild.name} was deleted because it contained an invite link.`);
   }
+
+  
   
   if (badWords.some(word => message.content.toLowerCase().includes(word))) {
     message.delete();
@@ -43,6 +49,29 @@ client.on('messageCreate', (message) => {
   if (mentions > 5) {
     message.delete();
     member.send(`Sorry, your message in ${guild.name} was deleted because it contained too many mentions.`);
+  }
+});
+
+client.on('interactionCreate', async interaction => {
+  if (!interaction.isCommand() || interaction.user.bot) return;
+
+  const command = interaction.commandName;
+
+  if (command === 'exempt') {
+    // Check if user has permission to manage channels
+    if (!interaction.member.permissions.has('MANAGE_CHANNELS')) {
+      return interaction.reply({ content: 'You do not have permission to manage channels.', ephemeral: true });
+    }
+
+    // Check if channel is already exempted
+    if (exemptedChannels.includes(interaction.channel.id)) {
+      exemptedChannels.splice(exemptedChannels.indexOf(interaction.channel.id), 1);
+      return interaction.reply({ content: `This channel is no longer exempted from moderation.`, ephemeral: true });
+    }
+
+    // Add channel to exempted channels list
+    exemptedChannels.push(interaction.channel.id);
+    interaction.reply({ content: `This channel is now exempted from moderation.`, ephemeral: true });
   }
 });
 
@@ -73,4 +102,4 @@ client.on('messageCreate', async message => {
   }
 });
 
-client.login('bot token');
+client.login('your bot token');
