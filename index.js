@@ -1,7 +1,7 @@
 const { Client, Intents } = require('discord.js');
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
 const keepAlive = require('./alive.js')
-keepAlive()
+keepAlive();
 
 const fs = require('fs');
 
@@ -40,7 +40,7 @@ client.on('messageCreate', (message) => {
   }
 
    // Check for NSFW links
-  const nsfwRegex = /(pornhub|xvideos|xnxx|redtube|youporn|nhentai|hanime|hentaimama|xhamster|hentaihaven|nutaku|brazzers|rule34video)\.(com|tv)/i;
+  const nsfwRegex = /(pornhub|xvideos|xnxx|redtube|youporn|nhentai|hanime|hentaimama|xhamster|hentaihaven|nutaku|brazzers|rule34video|e-hentai|luscious|underhentai)\.(com|tv|org|net)/i;
   if (nsfwRegex.test(message.content)) {
     message.delete();
     member.send(`Sorry, your message in ${guild.name} was deleted because it contained an NSFW link.`);
@@ -55,6 +55,12 @@ client.on('messageCreate', (message) => {
   if (capsPercentage > 0.5) {
     message.delete();
     member.send(`Sorry, your message in ${guild.name} was deleted because it contained too many capital letters.`);
+  }
+
+  const mentions = message.mentions.members.size + message.mentions.roles.size;
+  if (mentions > 5) {
+    message.delete();
+    member.send(`Sorry, your message in ${guild.name} was deleted because it contained too many mentions.`);
   }
 });
 
