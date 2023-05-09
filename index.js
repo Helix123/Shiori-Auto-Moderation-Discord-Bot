@@ -25,7 +25,7 @@ client.on('messageCreate', (message) => {
   if (message.author.bot) return; // ignore messages from other bots
   const member = message.member;
   const guild = message.guild;
-  const badWords = ['fuck', 'sex', 'nigga', 'swine', 'bitch', 'motherfucker', 'mf', 'fk', 'bish', 'son of a bitch', 'FUCK', 'SEX', 'NIGGA', 'SWINE', 'BITCH', 'MOTHERFUCKER', 'MF', 'FK', 'BISH', 'women rights', 'cult', 'dumbass', 'dumbfuck', 'shit', 'shitting', 'fucking', 'bitching', 'nigger', 'NIGGER', 'fucker'];
+  const badWords = ['fuck', 'sex', 'nigga', 'swine', 'bitch', 'motherfucker', 'mf', 'fk', 'bish', 'son of a bitch', 'FUCK', 'SEX', 'NIGGA', 'SWINE', 'BITCH', 'MOTHERFUCKER', 'MF', 'FK', 'BISH', 'women rights', 'cult', 'dumbass', 'dumbfuck', 'shit', 'shitting', 'fucking', 'bitching', 'nigger', 'NIGGER', 'fucker', 'asshole', 'asskisser', 'bastard', 'bimbo', 'dickhead', 'dork', 'dweeb', 'geezer', 'slut', 'hoe', 'jerk', 'pussy', 'kike', 'klutz', 'meathead', 'lardass', 'limey', 'pig', 'wog', 'wop', 'ass-kisser', 'ass'];
 
   // Check if message was sent in exempted channel
   if (exemptedChannels.includes(message.channel.id)) {
@@ -40,7 +40,7 @@ client.on('messageCreate', (message) => {
   }
 
    // Check for NSFW links
-  const nsfwRegex = /https?:\/\/(www\.)?(pornhub|xvideos|xnxx|redtube|youporn|nhentai|hanime|hentaimama|xhamster|hentaihaven|nutaku|brazzers|rule34video)\.(com|tv)/i;
+  const nsfwRegex = /(pornhub|xvideos|xnxx|redtube|youporn|nhentai|hanime|hentaimama|xhamster|hentaihaven|nutaku|brazzers|rule34video)\.(com|tv)/i;
   if (nsfwRegex.test(message.content)) {
     message.delete();
     member.send(`Sorry, your message in ${guild.name} was deleted because it contained an NSFW link.`);
