@@ -56,12 +56,6 @@ client.on('messageCreate', (message) => {
     message.delete();
     member.send(`Sorry, your message in ${guild.name} was deleted because it contained too many capital letters.`);
   }
-
-  const mentions = message.mentions.members.size + message.mentions.roles.size;
-  if (mentions > 5) {
-    message.delete();
-    member.send(`Sorry, your message in ${guild.name} was deleted because it contained too many mentions.`);
-  }
 });
 
 client.on('interactionCreate', async interaction => {
