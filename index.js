@@ -1,10 +1,17 @@
 const { Client, Intents } = require('discord.js');
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
 const keepAlive = require('./alive.js')
-keepAlive();
+keepAlive()
+
+const fs = require('fs');
+
 
 // List of exempted channels
-const exemptedChannels = [];
+let exemptedChannels = [];
+if (fs.existsSync('./exempted-channels.json')) {
+  const data = fs.readFileSync('./exempted-channels.json', 'utf8');
+  exemptedChannels = JSON.parse(data);
+}
 
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}`);
@@ -32,8 +39,13 @@ client.on('messageCreate', (message) => {
     member.send(`Sorry, your message in ${guild.name} was deleted because it contained an invite link.`);
   }
 
-  
-  
+   // Check for NSFW links
+  const nsfwRegex = /https?:\/\/(www\.)?(pornhub|xvideos|xnxx|redtube|youporn|nhentai|hanime|hentaimama|xhamster|hentaihaven|nutaku|brazzers|rule34video)\.(com|tv)/i;
+  if (nsfwRegex.test(message.content)) {
+    message.delete();
+    member.send(`Sorry, your message in ${guild.name} was deleted because it contained an NSFW link.`);
+  }
+ 
   if (badWords.some(word => message.content.toLowerCase().includes(word))) {
     message.delete();
     member.send(`Sorry, your message in ${guild.name} was deleted because it contained a bad word or illegal practices.`);
@@ -66,11 +78,13 @@ client.on('interactionCreate', async interaction => {
     // Check if channel is already exempted
     if (exemptedChannels.includes(interaction.channel.id)) {
       exemptedChannels.splice(exemptedChannels.indexOf(interaction.channel.id), 1);
+      fs.writeFileSync('./exempted-channels.json', JSON.stringify(exemptedChannels));
       return interaction.reply({ content: `This channel is no longer exempted from moderation.`, ephemeral: true });
     }
 
     // Add channel to exempted channels list
     exemptedChannels.push(interaction.channel.id);
+    fs.writeFileSync('./exempted-channels.json', JSON.stringify(exemptedChannels));
     interaction.reply({ content: `This channel is now exempted from moderation.`, ephemeral: true });
   }
 });
@@ -93,13 +107,15 @@ client.on('messageCreate', async message => {
     // Check if channel is already exempted
     if (exemptedChannels.includes(message.channel.id)) {
       exemptedChannels.splice(exemptedChannels.indexOf(message.channel.id), 1);
+      fs.writeFileSync('./exempted-channels.json', JSON.stringify(exemptedChannels));
       return message.reply(`This channel is no longer exempted from moderation.`);
     }
 
     // Add channel to exempted channels list
     exemptedChannels.push(message.channel.id);
+    fs.writeFileSync('./exempted-channels.json', JSON.stringify(exemptedChannels));
     message.reply(`This channel is now exempted from moderation.`);
   }
 });
 
-client.login('your bot token');
+client.login('token here');
